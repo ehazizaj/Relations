@@ -75,7 +75,10 @@ Route::get('/force_delete_address/{id}', function ($id){
 
     $user = User::findOrFail($id);
     $user->address->forcedelete();
+    //fhsdfhsfh
     return "done";
+
+
 
 });
 
