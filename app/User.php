@@ -28,4 +28,10 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+    //you don't have to add the foreign key parameter if you have follow the convention "user_id", it is just for illustration
+    public function address(){
+
+        return $this->hasOne('App\Address','user_id')->withTrashed();
+    }
+
 }
