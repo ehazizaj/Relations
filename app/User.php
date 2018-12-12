@@ -31,7 +31,12 @@ class User extends Authenticatable
     //you don't have to add the foreign key parameter if you have follow the convention "user_id", it is just for illustration
     public function address(){
 
-        return $this->hasOne('App\Address','user_id')->withTrashed();
+        return $this->hasOne('App\Address','user_id');
     }
 
+
+    public function posts(){
+
+        return $this->hasMany('App\Post');
+    }
 }

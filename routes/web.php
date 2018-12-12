@@ -3,7 +3,7 @@ use App\User;
 use App\Address;
 /*
 |--------------------------------------------------------------------------
-| Web Routes
+| NOTE: ALL THE ROUTES ARE "GET" BECAUSE THE FUNCTIONS ARE BEING USED DIRECTLY FORM ROUTE FILES
 |--------------------------------------------------------------------------
 |
 | Here is where you can register web routes for your application. These
@@ -12,14 +12,28 @@ use App\Address;
 |
 */
 
-//NOTE: ALL THE ROUTES ARE "GET" BECAUSE THE FUNCTIONS ARE BEING USED DIRECTLY FORM ROUTE FILES
+
+
+
+
+
+
+/*
+|-----------------------------------------------------------------------------------------------
+| NOTE: ALL THE ROUTES ARE "GET" BECAUSE THE FUNCTIONS ARE BEING USED DIRECTLY FORM ROUTE FILES
+|-----------------------------------------------------------------------------------------------
+*/
 
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-//One to one Relations
+/*
+|--------------------------------------------------------------------------
+|One to one relation actions
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/insert_address/{id}', function ($id){
 
@@ -75,11 +89,7 @@ Route::get('/force_delete_address/{id}', function ($id){
 
     $user = User::findOrFail($id);
     $user->address->forcedelete();
-    //fhsdfhsfh
     return "done";
-
-
-
 });
 
 //Restore From Soft Delete
@@ -99,3 +109,15 @@ Route::get('/restore_delete_address/{id}', function ($id){
     return "done";
 
 });
+
+/*
+|--------------------------------------------------------------------------
+|One to many relation actions
+|--------------------------------------------------------------------------
+*/
+Route::get('/create/post', function (){
+
+
+
+});
+
