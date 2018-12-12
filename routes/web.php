@@ -1,6 +1,7 @@
 <?php
 use App\User;
 use App\Address;
+use App\Post;
 /*
 |--------------------------------------------------------------------------
 | NOTE: ALL THE ROUTES ARE "GET" BECAUSE THE FUNCTIONS ARE BEING USED DIRECTLY FORM ROUTE FILES
@@ -115,9 +116,57 @@ Route::get('/restore_delete_address/{id}', function ($id){
 |One to many relation actions
 |--------------------------------------------------------------------------
 */
-Route::get('/create/post', function (){
+Route::get('/create/post/{id}', function ($id){
 
+    $user = User::findOrFail($id);
 
+    $post = new Post(['title'=>'First Post', 'body'=>'Post BOdy']);
+
+    $user->posts()->save($post);
+
+    return 'done';
 
 });
 
+
+Route::get('/posts/{id}', function ($id){
+  $user = User::findOrFail($id);
+
+  foreach ($user->posts as $post){
+
+     echo  "Title:". $post->title . "&nbsp" . "&nbsp" , "Body:".  $post->body . "<br>";
+
+        }
+});
+
+Route::get('/update/post/{id}/{post}', function ($id, $post){
+
+    $user = User::findOrFail($id);
+    $user->posts()->whereId($post)->update(['title'=>'update by update', 'body'=>'update function']);
+    return 'done';
+});
+
+//NOTE: In order to use Soft Delete we must make a migration to add deleted_at column and include SoftDeletes to model
+// like in the Address Model.
+//Hard Delete a specific posts
+Route::get('/delete/post/{id}/{post}', function ($id, $post){
+
+    $user = User::findOrFail($id);
+    $user->posts()->whereId($post)->delete();
+    return 'done';
+});
+//Hard Delete all user posts
+Route::get('/delete/post/{id}', function ($id){
+
+    $user = User::findOrFail($id);
+    $user->posts()->delete();
+    return 'done';
+});
+
+//Get User by post id
+Route::get('/post/{id}', function ($id){
+
+    $post = Post::findOrFail($id)->user()->name;
+    //dd($post->user());
+    return $post->user();
+});
