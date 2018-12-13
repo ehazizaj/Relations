@@ -3,6 +3,11 @@ use App\User;
 use App\Address;
 use App\Post;
 use App\Role;
+use App\Staff;
+use App\Product;
+use App\Photo;
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | NOTE: ALL THE ROUTES ARE "GET" BECAUSE THE FUNCTIONS ARE BEING USED DIRECTLY FORM ROUTE FILES
@@ -219,4 +224,94 @@ Route::get('delete/{user_id}/{role_id}', function ($user_id, $role_id){
     {
         $role->whereId($role_id)->delete();
     }
+});
+
+//Attach a role to a user, this writes in "role_users" table
+//Attach method add records even if that record already excist.
+Route::get('/attach/{id}/{role}', function ($id, $role){
+
+    $user = User::findOrFail($id);
+
+    $user->roles()->attach($role);
+
+});
+
+
+//Detach a role to a user, this writes in "role_users" table.
+//Detach can be also used without the id patameter to detach all the users role.
+Route::get('/detach/{id}/{role}', function ($id, $role){
+
+    $user = User::findOrFail($id);
+    $user->roles()->detach($role);
+
+});
+
+//Sync method delete every other value that is not n the sync array, it writes "role_users" table.
+Route::get('/sync/{id}', function ($id){
+
+    $user = User::findOrFail($id);
+    $user->roles()->sync([1,2]);
+});
+
+/*
+|--------------------------------------------------------------------------
+| One to Many Polymorphic Relationship
+|--------------------------------------------------------------------------
+*/
+
+//THE EXAMPLES IN THIS SECTION ARE NOT WITH DYNAMIC ID, I HAVE SET THEM STATIC
+Route::get('insert_polymorphic', function (){
+
+        $staff = Staff::findOrFail(1);
+        $staff->photos()->create(['path'=>'photo_2.jpg']);
+//        $product = Product::find(1);
+//        $product->photos()->create(['path'=>'products.jpg']);
+});
+
+Route::get('read_polymorphic', function (){
+
+        $staff = Staff::findOrFail(1);
+        $photos= array();
+        foreach ($staff->photos as $photo){
+            array_push($photos, $photo);
+        }
+        return $photos;
+});
+
+Route::get('update_polymorphic', function (){
+
+    $staff = Staff::findOrFail(1);
+
+    $photo = $staff->photos()->whereId(1)->first();
+
+    $photo->path = "epdate.jpg";
+
+    $photo->save();
+});
+
+Route::get('delete_polymorphic', function (){
+
+    $staff = Staff::findOrFail(1);
+
+    $photo = $staff->photos()->whereId(1)->first();
+
+    $photo->delete();
+
+});
+
+//Assign an existing photo to a model
+Route::get('assign', function (){
+
+    $staff = Staff::findOrFail(1);
+    $photo = Photo::findOrFail(3);
+    $staff->photos()->save($photo);
+
+});
+
+Route::get('un-assign', function (){
+
+    $staff = Staff::findOrFail(1);
+    //$photo = Photo::findOrFail(3);
+    $staff->photos()->whereId(2)->update(['imageable_id'=> 0, 'imageable_type'=>'']);
+
 });
