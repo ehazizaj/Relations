@@ -2,6 +2,7 @@
 use App\User;
 use App\Address;
 use App\Post;
+use App\Role;
 /*
 |--------------------------------------------------------------------------
 | NOTE: ALL THE ROUTES ARE "GET" BECAUSE THE FUNCTIONS ARE BEING USED DIRECTLY FORM ROUTE FILES
@@ -163,10 +164,59 @@ Route::get('/delete/post/{id}', function ($id){
     return 'done';
 });
 
-//Get User by post id
+//Get User by post id / Inverse One to Many
 Route::get('/post/{id}', function ($id){
 
-    $post = Post::findOrFail($id)->user()->name;
-    //dd($post->user());
-    return $post->user();
+    $post = Post::findOrFail($id);
+   return $post->user->name;
+
+});
+
+/*
+|--------------------------------------------------------------------------
+|Many to many relation actions
+|--------------------------------------------------------------------------
+*/
+//Create role for user
+Route::get('/create/user_role/{id}', function ($id){
+
+    $user = User::findOrFail($id);
+
+//    $role = new Role(['name'=>'Administrator']);
+//    $user->roles()->save($role);
+
+    $user->roles()->save(new Role(['name'=>'Operator']));
+    return 'done';
+});
+
+//Get User Roles
+Route::get('user/{id}/role', function ($id){
+
+    $user = User::findOrFail($id);
+
+
+    foreach ($user->roles as $role)
+    {
+      echo $role->name ."<br>";
+    }
+});
+
+//Get Role Users
+Route::get('role/{id}/user', function ($id){
+
+    $role = Role::findOrFail($id);
+
+    foreach ($role->users as $user)
+    {
+        echo $user->name ."<br>";
+    }
+});
+
+Route::get('delete/{user_id}/{role_id}', function ($user_id, $role_id){
+
+    $user = User::findOrFail($user_id);
+    foreach ($user->roles as $role)
+    {
+        $role->whereId($role_id)->delete();
+    }
 });
