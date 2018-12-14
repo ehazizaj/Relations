@@ -6,6 +6,9 @@ use App\Role;
 use App\Staff;
 use App\Product;
 use App\Photo;
+use  App\Article;
+use App\Video;
+use App\Tag;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,19 +21,6 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-
-
-
-
-
-
-/*
-|-----------------------------------------------------------------------------------------------
-| NOTE: ALL THE ROUTES ARE "GET" BECAUSE THE FUNCTIONS ARE BEING USED DIRECTLY FORM ROUTE FILES
-|-----------------------------------------------------------------------------------------------
-*/
-
 
 Route::get('/', function () {
     return view('welcome');
@@ -253,13 +243,16 @@ Route::get('/sync/{id}', function ($id){
     $user->roles()->sync([1,2]);
 });
 
+//THE EXAMPLES IN THIS SECTIONS BELOW ARE NOT WITH DYNAMIC ID, I HAVE SET THEM STATIC
+
 /*
 |--------------------------------------------------------------------------
 | One to Many Polymorphic Relationship
+ in this case we save the images of staff and products in the same table
 |--------------------------------------------------------------------------
 */
 
-//THE EXAMPLES IN THIS SECTION ARE NOT WITH DYNAMIC ID, I HAVE SET THEM STATIC
+
 Route::get('insert_polymorphic', function (){
 
         $staff = Staff::findOrFail(1);
@@ -308,6 +301,7 @@ Route::get('assign', function (){
 
 });
 
+//un-assign an existing photo to a model
 Route::get('un-assign', function (){
 
     $staff = Staff::findOrFail(1);
@@ -315,3 +309,67 @@ Route::get('un-assign', function (){
     $staff->photos()->whereId(2)->update(['imageable_id'=> 0, 'imageable_type'=>'']);
 
 });
+
+/*
+|--------------------------------------------------------------------------
+| Many to Many Polymorphic Relationship
+share the taggs between posts and videos and save it to taggable model
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/create/poli',function (){
+
+        $article = Article::create(['name'=>'first article']);
+        $tag1 = Tag::findOrFail(1);
+        $article->tags()->save($tag1);
+
+        $video = Video::create(['name'=>'video.mp4']);
+        $tag2 = Tag::findOrFail(2);
+        $video->tags()->save($tag2);
+
+});
+
+
+Route::get('/read/poli',function (){
+
+    $article = Article::findOrFail(1);
+
+    foreach ($article->tags as $tag){
+
+        echo $tag;
+    }
+});
+
+Route::get('/update/poli',function (){
+
+    $article = Article::findOrFail(1);
+
+    foreach ($article->tags as $tag){
+
+        $tag->whereName('article')->update(['name'=>'article tag updated']);
+
+    }
+});
+
+Route::get('/update/2',function (){
+
+    $article = Article::findOrFail(1);
+
+    $tag = Tag::findOrFail(2);
+    $article->tags()->save($tag);
+    //$article->tags()->attach($tag);
+    //$article->tags()->sync([1]);
+});
+
+
+Route::get('/delete/poli',function (){
+
+    $article = Video::findOrFail(1);
+
+    foreach ($article->tags as $tag){
+
+        $tag->whereId(3)->delete();
+
+    }
+});
+
