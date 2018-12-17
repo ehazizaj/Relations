@@ -1,2 +1,2 @@
 # Relations
-This repo is a one to one model relation crud
+This repo is Eloquent Relationships CRUD Operations with DB Migration.
